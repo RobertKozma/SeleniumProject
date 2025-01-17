@@ -6,6 +6,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class PracticeFormTest {
     public WebDriver driver;
@@ -110,6 +114,30 @@ public class PracticeFormTest {
         js.executeScript("arguments[0].click();", cityField);
         cityField.sendKeys("Delhi");
         cityField.sendKeys(Keys.ENTER);
+
+        WebElement submitField=driver.findElement(By.id("submit"));
+        js.executeScript("arguments[0].click();", submitField);
+
+        //Identificam coloanele tabelului dupa ce am dat submit la form
+
+        List<WebElement> submitFormElementsLeft = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[1]"));
+        Integer submitFormSizeLeft=submitFormElementsLeft.size();
+        String studentName=submitFormElementsLeft.get(0).getText();
+//        System.out.println("Marime Tabel stanga este: "+submitFormSizeLeft);
+//        System.out.println("Nume label stanga este: "+studentName);
+
+        List<WebElement> submitFormElementsRight = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[2]"));
+        Integer submitFormSizeRight=submitFormElementsRight.size();
+        String studentNameValue=submitFormElementsRight.get(0).getText();
+//        System.out.println("Marime Tabel dreapta este: "+submitFormSizeRight);
+        System.out.println("Valoare dreapta pentru rubrica '"+studentName+"' este: "+studentNameValue);
+
+
+
+
+        Thread.sleep(1500);
+        driver.close();
+
 
     }
 
