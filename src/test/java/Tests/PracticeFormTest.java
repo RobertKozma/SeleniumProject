@@ -3,6 +3,7 @@ package Tests;
 import net.bytebuddy.asm.Advice;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -118,19 +119,56 @@ public class PracticeFormTest {
         WebElement submitField=driver.findElement(By.id("submit"));
         js.executeScript("arguments[0].click();", submitField);
 
-        //Identificam coloanele tabelului dupa ce am dat submit la form
+        //Identificam coloanele tabelului dupa ce am dat submit la form (List)
 
-        List<WebElement> submitFormElementsLeft = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[1]"));
-        Integer submitFormSizeLeft=submitFormElementsLeft.size();
-        String studentName=submitFormElementsLeft.get(0).getText();
-//        System.out.println("Marime Tabel stanga este: "+submitFormSizeLeft);
-//        System.out.println("Nume label stanga este: "+studentName);
+        List<WebElement> formLabels = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[1]"));
+        Integer formLabelsSize= formLabels.size();
+        String label1=formLabels.get(0).getText();
+        Integer indexLabel=0;
+        while (indexLabel<formLabels.size()){
+            System.out.println("Label-ul pentru pozitia "+indexLabel+" este: "+formLabels.get(indexLabel).getText());
+            indexLabel++;
+        }
 
-        List<WebElement> submitFormElementsRight = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[2]"));
-        Integer submitFormSizeRight=submitFormElementsRight.size();
-        String studentNameValue=submitFormElementsRight.get(0).getText();
-//        System.out.println("Marime Tabel dreapta este: "+submitFormSizeRight);
-        System.out.println("Valoare dreapta pentru rubrica '"+studentName+"' este: "+studentNameValue);
+        //Identificam valorile din coloana Label (array)
+//        String[] labels=new String[10];
+//        labels[0]=formLabels.get(0).getText();
+//        labels[1]=formLabels.get(1).getText();
+//        labels[2]=formLabels.get(2).getText();
+//        labels[3]=formLabels.get(3).getText();
+//        labels[4]=formLabels.get(4).getText();
+//        labels[5]=formLabels.get(5).getText();
+//        labels[6]=formLabels.get(6).getText();
+//        labels[7]=formLabels.get(7).getText();
+//        labels[8]=formLabels.get(8).getText();
+//        labels[9]=formLabels.get(9).getText();
+
+//        for (int index=0;index<labels.length;index++){
+//            System.out.println("Nume label este "+labels[index]);
+//        }
+//        System.out.println("Marime Tabel stanga este: "+formLabelsSize);
+//        System.out.println("Nume label stanga este: "+label1);
+
+        //Identificam valorile din coloana Values
+
+        List<WebElement> formValues = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[2]"));
+//        Integer submitFormSizeRight=submitFormElementsRight.size();
+//        String studentNameValue=submitFormElementsRight.get(0).getText();
+
+        Integer indexValues=0;
+        while (indexValues<formValues.size()){
+            System.out.println("Valoarea pentru pozitia "+indexValues+" este: "+formValues.get(indexValues).getText());
+            indexValues++;
+        }
+
+//        for (int i=0; i<formValues.size()-1;i++){
+//
+//            WebElement valoareValues=formValues.get(i);
+//            WebElement nextValue=formValues.get(i+1);
+//
+//            //System.out.println("Numarul elementului este " +webElement.getText());
+//            System.out.println("urmatoarea valoare este "+nextValue.getText());
+//        }
 
 
 
