@@ -5,18 +5,20 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PracticeFormTest_01 {
 
     public WebDriver driver;
 
     @Test
-    public void automationMethod() throws InterruptedException {
+    public void automationMethod() throws InterruptedException, ParseException {
 
         // deschidem un browser de Chrome
         driver = new ChromeDriver();
@@ -35,7 +37,7 @@ public class PracticeFormTest_01 {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollBy(0,250)");
 
-        // declaram un element
+        //declaram un element
         WebElement formField = driver.findElement(By.xpath("//h5[text()='Forms']"));
         formField.click();
 
@@ -90,14 +92,58 @@ public class PracticeFormTest_01 {
         Thread.sleep(500);
 
         //Alegem data de nastere
-        insertBirthDate("2003", "May", "14");
+//        insertBirthDate("2003", "May", "14");
+
+        //Insert birth date
+        String birthMonth = "August";
+        String birthYear = "1975";
+        String birthDay = "15";
+
+        WebElement dateOfBirthField = driver.findElement(By.xpath("//input[@id='dateOfBirthInput']"));
+        dateOfBirthField.click();
+
+        WebElement clickMonth = driver.findElement(By.xpath("//select[@class='react-datepicker__month-select']"));
+        clickMonth.click();
+
+//        List<WebElement> monthFiled = driver.findElements(By.xpath("//select[@class='react-datepicker__month-select']//option"));
+        Select month = new Select(clickMonth);
+        month.selectByVisibleText(birthMonth);
+
+        WebElement clickYear = driver.findElement(By.xpath("//select[@class='react-datepicker__year-select']"));
+        clickYear.click();
+
+//        List<WebElement> yearFiled = driver.findElements(By.xpath("//select[@class='react-datepicker__year-select']//option"));
+        Select year = new Select(clickYear);
+        year.selectByValue(birthYear);
+
+        List<WebElement> datePickerList = driver.findElements(By.xpath("//div[@class='react-datepicker__week']//div"));
+
+        for (int i = 0; i < datePickerList.size(); i++) {
+            String ariaLabel = datePickerList.get(i).getAttribute("aria-label");
+
+            if (ariaLabel.contains(birthMonth + " " + birthDay + "th, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "st, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "nd, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "rd, " + birthYear)) {
+                WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
+                System.out.println("Datepicker label is " + "'"+ariaLabel+"'");
+                calendarField.click();
+                break;
+            }
+        }
+
+        Thread.sleep(500);
+        //Get chosen Birth Date
+
+        String date = driver.findElement(By.id("dateOfBirthInput")).getAttribute("value");
+        System.out.println("Birth Date is: " + date);
+
+        //Parse Birth Date for latter assert
+
+        SimpleDateFormat formatter1 = new SimpleDateFormat("dd MMM yyyy");
+        Date submittedBirthDate = formatter1.parse(date);
+        System.out.println("Submitted Birth Date is: " + submittedBirthDate);
 
         Thread.sleep(500);
 
-//        String date = driver.findElement(By.id("dateOfBirthInput")).getAttribute("value");
-//        System.out.println("BDAY is: " + date);
-
-        Thread.sleep(500);
+        //Upload picture
 
         WebElement pictureField = driver.findElement(By.id("uploadPicture"));
         File file = new File("src/test/resources/download.jpg");
@@ -106,6 +152,8 @@ public class PracticeFormTest_01 {
 //        System.out.println("Uploaded file name is: "+filename);
 
         Thread.sleep(500);
+
+        //Subject field selection
 
         WebElement subjectsField = driver.findElement(By.id("subjectsInput"));
         String subjectsValue = "Social Studies";
@@ -117,6 +165,8 @@ public class PracticeFormTest_01 {
 
         Thread.sleep(500);
 
+        //Choose state
+
         WebElement stateField = driver.findElement(By.id("react-select-3-input"));
         js.executeScript("arguments[0].click();", stateField);
         stateField.sendKeys("NCR");
@@ -124,10 +174,14 @@ public class PracticeFormTest_01 {
 
         Thread.sleep(500);
 
+        //Choose city
+
         WebElement cityField = driver.findElement(By.id("react-select-4-input"));
         js.executeScript("arguments[0].click();", cityField);
         cityField.sendKeys("Delhi");
         cityField.sendKeys(Keys.ENTER);
+
+        //Check chosen state and city
 
         WebElement currentState = driver.findElement(By.xpath("//div[@id='state']//div[@class=' css-1uccc91-singleValue']"));
         WebElement currentCity = driver.findElement(By.xpath("//div[@id='city']//div[@class=' css-1uccc91-singleValue']"));
@@ -137,99 +191,51 @@ public class PracticeFormTest_01 {
 
         Thread.sleep(500);
 
+        //Submit form
+
         WebElement submitField = driver.findElement(By.id("submit"));
         js.executeScript("arguments[0].click();", submitField);
 
         //Identificam coloanele tabelului dupa ce am dat submit la form (List)
 
-        List<WebElement> formLabels = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[1]"));
+//        List<WebElement> formLabels = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[1]"));
 
         //Identificam valorile din coloana Values
 
         List<WebElement> formValues = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[2]"));
 
-        int indexLabel = 0;
-        int indexValue = 0;
-        while (indexLabel < formLabels.size() || indexValue < formValues.size()) {
-            System.out.println("Labelul si Valoare pt indexul " + indexLabel + " este " + formLabels.get(indexLabel).getText() + " - " + formValues.get(indexValue).getText());
-            indexLabel++;
-            indexValue++;
-        }
+//        int indexLabel = 0;
+//        int indexValue = 0;
+//        while (indexLabel < formLabels.size() || indexValue < formValues.size()) {
+//            System.out.println("Labelul si Valoare pt indexul " + indexLabel + " este " + formLabels.get(indexLabel).getText() + " - " + formValues.get(indexValue).getText());
+//            indexLabel++;
+//            indexValue++;
+//        }
 
-        //Asserts on the submited data
 
         String fullName = firstNameValue + " " + lastNameValue;
         String stateCity = state + " " + city;
-//        Assert.assertEquals(formValues.get(0).getText(), firstNameValue + " " + lastNameValue);
+        String birthDate = formValues.get(4).getText();
+        SimpleDateFormat formatter2 = new SimpleDateFormat("dd MMMM,yyyy", Locale.ENGLISH);
+        Date recordedBirthDate = formatter2.parse(birthDate);
+        System.out.println("Recorded Birth Date is: " + recordedBirthDate);
+
+        //Asserts on the submited data
+
         Assert.assertEquals(formValues.get(0).getText(), fullName);
         Assert.assertEquals(formValues.get(1).getText(), emailNameValue);
         Assert.assertEquals(formValues.get(2).getText(), genderValue);
         Assert.assertEquals(formValues.get(3).getText(), mobileNumberValue);
-//        Assert.assertEquals(formValues.get(4).getText(),dateOfBirth);
+        Assert.assertEquals(recordedBirthDate, submittedBirthDate);
         //  DateFormat newDate = formValues.get(4).getText(),dateOfBirth);
         Assert.assertEquals(formValues.get(5).getText(), subjectsValue);
         Assert.assertEquals(formValues.get(6).getText(), "");
         Assert.assertEquals(formValues.get(7).getText(), filename);
         Assert.assertEquals(formValues.get(8).getText(), "");
-//        Assert.assertEquals(formValues.get(9).getText(), state + " " + city);
         Assert.assertEquals(formValues.get(9).getText(), stateCity);
 
         Thread.sleep(1500);
         driver.quit();
 
-    }
-
-    public void insertBirthDate(String yearOfBirth, String monthOfBirth, String dayOfBirth) {
-        //Insert birth date
-        String birthMonth = monthOfBirth;
-        String birthYear = yearOfBirth;
-        String birthDay = dayOfBirth;
-        String birthDate= birthDay+" "+birthMonth+", "+birthYear;
-        System.out.println("Date of Birth is: "+birthDate);
-
-        WebElement dateOfBirthField = driver.findElement(By.xpath("//input[@id='dateOfBirthInput']"));
-        dateOfBirthField.click();
-
-        WebElement clickMonth = driver.findElement(By.xpath("//select[@class='react-datepicker__month-select']"));
-        clickMonth.click();
-
-        //List<WebElement> monthFiled = driver.findElements(By.xpath("//select[@class='react-datepicker__month-select']//option"));
-        Select month = new Select(clickMonth);
-        month.selectByVisibleText(monthOfBirth);
-
-        WebElement clickYear = driver.findElement(By.xpath("//select[@class='react-datepicker__year-select']"));
-        clickYear.click();
-
-        List<WebElement> yearFiled = driver.findElements(By.xpath("//select[@class='react-datepicker__year-select']//option"));
-        Select year = new Select(clickYear);
-        year.selectByValue(yearOfBirth);
-
-        List<WebElement> datePickerList = driver.findElements(By.xpath("//div[@class='react-datepicker__week']//div"));
-
-        for (int i = 0; i < datePickerList.size(); i++) {
-            String ariaLabel = datePickerList.get(i).getAttribute("aria-label");
-
-            if (ariaLabel.contains(birthMonth + " " + birthDay + "th, " + birthYear)) {
-                WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
-                System.out.println("date picker aria label is " + ariaLabel);
-                calendarField.click();
-                break;
-            } else if (ariaLabel.contains(birthMonth + " " + birthDay + "st, " + birthYear)) {
-                WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
-                System.out.println("date picker aria label is " + ariaLabel);
-                calendarField.click();
-                break;
-            } else if (ariaLabel.contains(birthMonth + " " + birthDay + "nd, " + birthYear)) {
-                WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
-                System.out.println("date picker aria label is " + ariaLabel);
-                calendarField.click();
-                break;
-            } else if (ariaLabel.contains(birthMonth + " " + birthDay + "rd, " + birthYear)) {
-                WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
-                System.out.println("date picker aria label is " + ariaLabel);
-                calendarField.click();
-                break;
-            }
-        }
     }
 }
