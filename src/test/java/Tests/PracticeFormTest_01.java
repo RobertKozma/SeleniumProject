@@ -6,7 +6,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.io.File;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -91,9 +90,6 @@ public class PracticeFormTest_01 {
 
         Thread.sleep(500);
 
-        //Alegem data de nastere
-//        insertBirthDate("2003", "May", "14");
-
         //Insert birth date
         String birthMonth = "August";
         String birthYear = "1975";
@@ -123,7 +119,7 @@ public class PracticeFormTest_01 {
 
             if (ariaLabel.contains(birthMonth + " " + birthDay + "th, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "st, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "nd, " + birthYear) || ariaLabel.contains(birthMonth + " " + birthDay + "rd, " + birthYear)) {
                 WebElement calendarField = driver.findElement(By.xpath("//div[@aria-label='" + ariaLabel + "']"));
-                System.out.println("Datepicker label is " + "'"+ariaLabel+"'");
+//                System.out.println("Datepicker label is " + "'"+ariaLabel+"'");
                 calendarField.click();
                 break;
             }
@@ -133,13 +129,7 @@ public class PracticeFormTest_01 {
         //Get chosen Birth Date
 
         String date = driver.findElement(By.id("dateOfBirthInput")).getAttribute("value");
-        System.out.println("Birth Date is: " + date);
-
-        //Parse Birth Date for latter assert
-
-        SimpleDateFormat formatter1 = new SimpleDateFormat("dd MMM yyyy");
-        Date submittedBirthDate = formatter1.parse(date);
-        System.out.println("Submitted Birth Date is: " + submittedBirthDate);
+//        System.out.println("Birth Date is: " + date);
 
         Thread.sleep(500);
 
@@ -204,6 +194,8 @@ public class PracticeFormTest_01 {
 
         List<WebElement> formValues = driver.findElements(By.xpath("//table[@class='table table-dark table-striped table-bordered table-hover']/tbody/tr/td[2]"));
 
+        //Listam datele din cele doua coloane ale tabelului
+
 //        int indexLabel = 0;
 //        int indexValue = 0;
 //        while (indexLabel < formLabels.size() || indexValue < formValues.size()) {
@@ -213,21 +205,36 @@ public class PracticeFormTest_01 {
 //        }
 
 
+        //Creating variables to be used for asserts
+
         String fullName = firstNameValue + " " + lastNameValue;
         String stateCity = state + " " + city;
         String birthDate = formValues.get(4).getText();
-        SimpleDateFormat formatter2 = new SimpleDateFormat("dd MMMM,yyyy", Locale.ENGLISH);
-        Date recordedBirthDate = formatter2.parse(birthDate);
-        System.out.println("Recorded Birth Date is: " + recordedBirthDate);
+//        System.out.println("Birth Date after submit is: "+birthDate);
 
-        //Asserts on the submited data
+        //Parse submitted and recorded Birth Date for assert
+
+        SimpleDateFormat inputFormatter1 = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+        SimpleDateFormat inputFormatter2 = new SimpleDateFormat("dd MMMM,yyyy", Locale.ENGLISH);
+
+        SimpleDateFormat outputFormater = new SimpleDateFormat("EEE MMM dd yyyy", Locale.ENGLISH);
+
+        Date submittedBirthDateParsed = inputFormatter1.parse(date);
+        Date recordedBirthDateParsed = inputFormatter2.parse(birthDate);
+
+        String submittedBirthDate = outputFormater.format(submittedBirthDateParsed);
+        String recordedBirthDate = outputFormater.format(recordedBirthDateParsed);
+
+//        System.out.println("Submitted Birth Date is: " + submittedBirthDate);
+//        System.out.println("Recorded Birth Date is: " + recordedBirthDate);
+
+        //Asserts to check that the submitted data is the same with the recorded data
 
         Assert.assertEquals(formValues.get(0).getText(), fullName);
         Assert.assertEquals(formValues.get(1).getText(), emailNameValue);
         Assert.assertEquals(formValues.get(2).getText(), genderValue);
         Assert.assertEquals(formValues.get(3).getText(), mobileNumberValue);
         Assert.assertEquals(recordedBirthDate, submittedBirthDate);
-        //  DateFormat newDate = formValues.get(4).getText(),dateOfBirth);
         Assert.assertEquals(formValues.get(5).getText(), subjectsValue);
         Assert.assertEquals(formValues.get(6).getText(), "");
         Assert.assertEquals(formValues.get(7).getText(), filename);
