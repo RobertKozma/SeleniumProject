@@ -5,7 +5,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class WebTableTest {
 
@@ -41,6 +45,9 @@ public class WebTableTest {
         WebTableField.click();
 
         Thread.sleep(2000);
+
+        List<WebElement> tableElements=driver.findElements(By.xpath("//div[@class='rt-tbody']/div/div[@class='rt-tr -even' or @class='rt-tr -odd']"));
+        Integer actualTableSize=tableElements.size();
 
         WebElement AddField=driver.findElement(By.id("addNewRecordButton"));
         AddField.click();
@@ -112,10 +119,26 @@ public class WebTableTest {
 
         Thread.sleep(2000);
 
-        WebElement DeleteField=driver.findElement(By.id("delete-record-4"));
-        DeleteField.click();
+//        WebElement DeleteField=driver.findElement(By.id("delete-record-4"));
+//        DeleteField.click();
+
+        List<WebElement> expecedTableElements=driver.findElements(By.xpath("//div[@class='rt-tbody']/div/div[@class='rt-tr -even' or @class='rt-tr -odd']"));
+        Integer finalTableSize=expecedTableElements.size();
+        Integer expectedTableSize=actualTableSize+1;
+
+        Assert.assertEquals(expecedTableElements.size(),expectedTableSize);
+        System.out.println("Final table size is: "+ finalTableSize);
+        System.out.println("Expected table size is: "+ expectedTableSize);
+
+        String actualTableValue=expecedTableElements.get(3).getText();
+        Assert.assertTrue(actualTableValue.contains(FirstNameValue));
+        Assert.assertTrue(actualTableValue.contains(LastNameValue));
+        Assert.assertTrue(actualTableValue.contains(EmailValue));
+        Assert.assertTrue(actualTableValue.contains(Salary2Value));
+        Assert.assertTrue(actualTableValue.contains(DepartmentValue));
+        Assert.assertTrue(actualTableValue.contains(AgeValue));
+
 
     }
-
 
 }
